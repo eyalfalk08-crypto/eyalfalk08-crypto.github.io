@@ -352,6 +352,21 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--prll);color:#1e1b4
     <button class="bp" onclick="saveShiftNote()" style="width:100%;">שמור</button>
   </div>
 </div>
+
+<div class="mo" id="mo-mgrblocks">
+  <div class="mb" style="max-width:580px;">
+    <button class="mc" onclick="cm('mo-mgrblocks')">✕</button>
+    <h3 id="mgrblk-title">עריכת חסימות</h3>
+    <div style="overflow-x:auto;">
+      <table id="mgrblk-table" style="width:100%;border-collapse:collapse;font-size:12px;"></table>
+    </div>
+    <div style="margin-top:.8rem;display:flex;gap:.6rem;justify-content:flex-end;">
+      <button onclick="cm('mo-mgrblocks')" style="padding:8px 18px;border:1.5px solid #e0e0e0;border-radius:8px;background:white;cursor:pointer;font-size:13px;">ביטול</button>
+      <button class="bp" onclick="saveMgrBlockEdit()" style="margin-top:0;">שמור שינויים</button>
+    </div>
+    <div class="sm" id="sm-mgrblk" style="text-align:center;margin-top:4px;">נשמר!</div>
+  </div>
+</div>
 <div class="mo" id="mo-vol">
   <div class="mb">
     <button class="mc" onclick="cm('mo-vol')">✕</button>
@@ -542,6 +557,46 @@ async function rEmpVol(){
   const vols=await fg('sched/weeks/'+w+'/volunteers')||{};
   const taskData=await fg('sched/weeks/'+w+'/tasks')||{};
   const grid=document.getElementById('vol-grid');grid.innerHTML='';
+  // Show MY current volunteerings first
+  const myVols=[];
+  for(let di=0;di<7;di++){
+    SHF.forEach(sh=>{
+      const v=vols['d'+di]&&vols['d'+di][sh.k]&&vols['d'+di][sh.k][CU.id];
+      if(v)myVols.push({di,sh,date:dates[di]});
+    });
+  }
+  if(myVols.length){
+    const myVolHdr=document.createElement('div');
+    myVolHdr.style.cssText='font-size:12px;font-weight:700;color:var(--prd);margin-bottom:.5rem;padding:.4rem .7rem;background:var(--prll);border-radius:7px;';
+    myVolHdr.textContent='✋ ההתנדבויות שלי השבוע';
+    grid.appendChild(myVolHdr);
+    myVols.forEach(({di,sh,date})=>{
+      const chip=document.createElement('div');
+      chip.style.cssText='display:inline-flex;align-items:center;gap:6px;background:#fef9c3;border:1px solid #d97706;border-radius:7px;padding:4px 10px;margin:2px;font-size:11px;font-weight:600;color:#713f12;';
+      chip.innerHTML='✋ '+DAYS[di]+' '+fd(date)+' — '+sh.l+
+        ' <button onclick="toggleVol(\''+w+'\','+di+',\''+sh.k+'\')" style="background:none;border:none;color:#991b1b;cursor:pointer;font-size:13px;padding:0;line-height:1;">×</button>';
+      grid.appendChild(chip);
+    });
+    const sep=document.createElement('div');sep.style.cssText='margin:.7rem 0;border-top:1px solid var(--prl);';
+    grid.appendChild(sep);
+  }
+  // My task volunteerings
+  const myTaskVols=Object.entries(taskData).filter(([,t])=>t.emps&&t.emps.includes(CU.id));
+  if(myTaskVols.length){
+    const mth=document.createElement('div');
+    mth.style.cssText='font-size:12px;font-weight:700;color:var(--prd);margin-bottom:.4rem;';
+    mth.textContent='📋 משימות שנרשמת אליהן:';grid.appendChild(mth);
+    myTaskVols.forEach(([tid,task])=>{
+      const r=document.createElement('div');
+      r.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid #d97706;border-radius:7px;margin-bottom:4px;background:#fef9c3;';
+      r.innerHTML='<span style="flex:1;font-size:12px;font-weight:600;">📋 '+task.name+(task.date?' — '+task.date:'')+(task.hours?' 🕐 '+task.hours:'')+'</span>'+
+        '<span style="font-size:10px;color:#713f12;font-weight:600;">✔ רשום</span>';
+      grid.appendChild(r);
+    });
+    const sep2=document.createElement('div');sep2.style.cssText='margin:.6rem 0;border-top:1px solid var(--prl);';
+    grid.appendChild(sep2);
+  }
+
   // Show open tasks for volunteering
   const openTasks=Object.entries(taskData).filter(([,t])=>t.volOpen&&!(t.emps&&t.emps.includes(CU.id)));
   if(openTasks.length){
@@ -586,9 +641,11 @@ async function rEmpVol(){
       } else {
         hasOpenShifts=true;
         if(myVol){
-          cellContent='<div onclick="toggleVol(\''+w+'\','+di+',\''+sh.k+'\')" style="background:#fef9c3;border:2px dashed #d97706;color:#713f12;border-radius:5px;padding:3px 4px;font-size:10px;font-weight:600;cursor:pointer;">✋ ממתין<br><span style="font-size:8px;">לחץ לביטול</span></div>';
+          cellContent='<div onclick="toggleVol(\''+w+'\','+di+',\''+sh.k+'\')" style="background:#fef9c3;border:2px dashed #d97706;color:#713f12;border-radius:5px;padding:3px 4px;font-size:10px;font-weight:700;cursor:pointer;line-height:1.4;">'+
+            '✋ ממתין<br><span style="font-size:8px;font-weight:400;">'+sh.l+' — '+DAYS[di]+'<br>'+fd(date)+'<br>לחץ לביטול</span></div>';
         } else {
-          cellContent='<div onclick="toggleVol(\''+w+'\','+di+',\''+sh.k+'\')" style="background:var(--prl);color:var(--pr);border:1.5px dashed #a78bfa;border-radius:5px;padding:3px 4px;font-size:10px;font-weight:600;cursor:pointer;">התנדב</div>';
+          cellContent='<div onclick="toggleVol(\''+w+'\','+di+',\''+sh.k+'\')" style="background:var(--prl);color:var(--pr);border:1.5px dashed #a78bfa;border-radius:5px;padding:3px 4px;font-size:10px;font-weight:700;cursor:pointer;line-height:1.4;">'+
+            '+ התנדב<br><span style="font-size:8px;font-weight:400;">'+sh.l+'<br>'+fd(date)+'</span></div>';
         }
       }
       rowHtml+='<td style="'+cellStyle+'">'+cellContent+'</td>';
@@ -822,6 +879,85 @@ window.autoAssign=async function(){
   });
   sl(true);await fs('sched/weeks/'+w+'/schedule',newS);sl(false);rMgrSched();
 };
+let _mgrBlkEmpId=null,_mgrBlkW=null,_mgrBlkData={};
+
+window.openMgrBlockEdit=async function(empId,empName){
+  _mgrBlkEmpId=empId;
+  _mgrBlkW=wk(CW);
+  sl(true);
+  const empBlocks=await fg('sched/weeks/'+_mgrBlkW+'/blocks/'+empId)||{};
+  sl(false);
+  _mgrBlkData={};
+  for(let di=0;di<7;di++){
+    _mgrBlkData['d'+di]={};
+    SHF.forEach(sh=>{_mgrBlkData['d'+di][sh.k]=(empBlocks['d'+di]&&empBlocks['d'+di][sh.k])||false;});
+  }
+  document.getElementById('mgrblk-title').textContent='עריכת חסימות — '+empName;
+  buildMgrBlkTable();
+  document.getElementById('mo-mgrblocks').classList.add('op');
+};
+
+function buildMgrBlkTable(){
+  const dates=wds(CW);
+  const tbl=document.getElementById('mgrblk-table');
+  tbl.innerHTML='';
+  // Header
+  const thead=document.createElement('tr');
+  const thHead=document.createElement('th');
+  thHead.style.cssText='padding:6px 4px;text-align:right;font-size:11px;color:var(--prd);';
+  thHead.textContent='משמרת';thead.appendChild(thHead);
+  dates.forEach((d,di)=>{
+    const th=document.createElement('th');
+    th.style.cssText='padding:6px 3px;text-align:center;font-size:10px;color:'+(di>=5?'var(--prm)':'var(--prd)')+';';
+    th.innerHTML=DAYS[di]+'<br><span style="font-weight:400;">'+fd(d)+'</span>';
+    thead.appendChild(th);
+  });
+  tbl.appendChild(thead);
+
+  function buildSection(label,filterFn){
+    const hdr=document.createElement('tr');
+    const tdh=document.createElement('td');
+    tdh.colSpan=8;
+    tdh.style.cssText='padding:4px 3px;font-size:10px;font-weight:700;color:var(--prd);background:var(--prll);';
+    tdh.textContent=label;hdr.appendChild(tdh);tbl.appendChild(hdr);
+    SHF.forEach(sh=>{
+      const tr=document.createElement('tr');
+      tr.style.borderTop='1px solid var(--prl)';
+      const tdl=document.createElement('td');
+      tdl.style.cssText='padding:5px 4px;font-weight:600;font-size:11px;white-space:nowrap;';
+      tdl.textContent=sh.l;tr.appendChild(tdl);
+      dates.forEach((d,di)=>{
+        const td=document.createElement('td');
+        td.style.cssText='padding:3px;text-align:center;';
+        if(!filterFn(di)){td.style.background='#f5f3ff';tr.appendChild(td);return;}
+        const blocked=_mgrBlkData['d'+di][sh.k];
+        const btn=document.createElement('div');
+        btn.style.cssText='cursor:pointer;border-radius:5px;padding:3px 2px;font-size:11px;font-weight:700;min-height:26px;display:flex;align-items:center;justify-content:center;background:'+(blocked?'#fee2e2':'var(--prl)')+';color:'+(blocked?'#991b1b':'var(--pr)')+';';
+        btn.textContent=blocked?'✕':'+';
+        btn.onclick=(()=>{const d2=di;const shk=sh.k;return()=>{_mgrBlkData['d'+d2][shk]=!_mgrBlkData['d'+d2][shk];buildMgrBlkTable();};})();
+        td.appendChild(btn);tr.appendChild(td);
+      });
+      tbl.appendChild(tr);
+    });
+  }
+  buildSection('📅 ימים רגילים (א׳–ה׳)',di=>di<5);
+  buildSection('🗓 סוף שבוע (ו׳–ש׳)',di=>di>=5);
+}
+
+window.toggleMgrBlk=function(di,shk){
+  _mgrBlkData['d'+di][shk]=!_mgrBlkData['d'+di][shk];
+  buildMgrBlkTable();
+};
+
+window.saveMgrBlockEdit=async function(){
+  if(!_mgrBlkEmpId)return;
+  sl(true);
+  await fs('sched/weeks/'+_mgrBlkW+'/blocks/'+_mgrBlkEmpId,_mgrBlkData);
+  sl(false);
+  ssm('sm-mgrblk');
+  setTimeout(()=>{cm('mo-mgrblocks');rMgrBlocks();},1500);
+};
+
 window.toggleShiftVol=async function(w,di,shk){
   const path='sched/weeks/'+w+'/volunteers/d'+di+'/'+shk+'/__open';
   const open=await fg(path);
@@ -871,10 +1007,13 @@ async function rMgrBlocks(){
     const shCnt={morning:0,evening:0,night:0};
     for(let di=0;di<7;di++){const db2=(blocks[emp.id]||{})['d'+di]||{};SHF.forEach(sh=>{if(db2[sh.k])shCnt[sh.k]++;});}
     const card=document.createElement('div');card.className='suc';
-    card.innerHTML='<div class="sun">'+emp.name+'</div>'+
+    card.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem;">'+
+      '<div class="sun">'+emp.name+'</div>'+
+      '<button onclick="openMgrBlockEdit(\''+emp.id+'\',\''+emp.name+'\')" style="font-size:10px;background:var(--prl);color:var(--pr);border:none;border-radius:5px;padding:2px 7px;cursor:pointer;font-weight:600;">עריכה</button>'+
+      '</div>'+
       '<span class="sut">'+(emp.type==='student'?'סטודנט':'עובד')+'</span>'+
       '<div style="font-size:9px;color:#888;margin-top:2px;">ב:'+shCnt.morning+'/'+(mb.morning||3)+' ע:'+shCnt.evening+'/'+(mb.evening||3)+' ל:'+shCnt.night+'/'+(mb.night||3)+'</div>'+
-      '<div style="margin-top:.2rem;">'+(chips.length?chips.map(c=>'<span class="chip">'+c+'</span>').join(''):'<span style="color:#bbb;font-size:10px;">ללא חסימות</span>')+'</div>'+
+      '<div style="margin-top:.3rem;">'+(chips.length?chips.map(c=>'<span class="chip">'+c+'</span>').join(''):'<span style="color:#bbb;font-size:10px;">ללא חסימות</span>')+'</div>'+
       (note?'<div style="margin-top:.2rem;"><span class="chip nt">📝 '+note+'</span></div>':'');
     grid.appendChild(card);
   });
