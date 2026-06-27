@@ -1751,7 +1751,7 @@ async function sendNotifTo(empId,type,title,body,w){
     triggerPush(title,body,type);
   }
   // OneSignal push to specific user (works when app closed)
-  oneSignalPushToUser(key,title,body);
+  await sendPushToUser(key,title,body);
 }
 
 async function loadNotifs(){
