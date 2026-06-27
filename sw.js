@@ -1,7 +1,8 @@
+importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
+
 // Service Worker - מערכת סידור עבודה
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
-
 self.addEventListener('push', e => {
   if(!e.data) return;
   let data;
@@ -18,7 +19,6 @@ self.addEventListener('push', e => {
     })
   );
 });
-
 self.addEventListener('message', e => {
   if(!e.data || e.data.type !== 'SHOW_NOTIF') return;
   const {title, body, tag} = e.data;
@@ -32,7 +32,6 @@ self.addEventListener('message', e => {
     })
   );
 });
-
 self.addEventListener('notificationclick', e => {
   e.notification.close();
   e.waitUntil(
