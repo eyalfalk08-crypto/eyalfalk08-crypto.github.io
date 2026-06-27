@@ -1961,6 +1961,11 @@ async function rEmpSwaps(){
   const emps=await fg('sched/config/employees')||DEF_EMPS;
   const container=document.getElementById('emp-swaps-content');
   container.innerHTML='';
+  const pub=await fg('sched/weeks/'+w+'/published');
+if(!pub){
+  container.innerHTML='<div class="card" style="text-align:center;padding:2rem;"><div style="font-size:40px;margin-bottom:1rem;">🔒</div><div style="font-size:16px;font-weight:800;color:#1e1b4b;">הסידור טרם פורסם</div><div style="font-size:13px;color:#9ca3af;margin-top:.4rem;">לאחר פרסום הסידור תוכל לבקש החלפות</div></div>';
+  return;
+}
   const mySwaps=Object.entries(swaps).filter(([,s])=>s.from===CU.id||s.to===CU.id);
   // Update badge — swaps that need MY action
   const needAction=mySwaps.filter(([,s])=>s.to===CU.id&&s.status==='waiting_employee').length;
@@ -1978,15 +1983,9 @@ async function rEmpSwaps(){
     // Status display
     let statusText,statusBg,statusColor,statusDesc='';
     switch(swap.status){
-      case 'waiting_employee':
-        if(isTarget){statusText='⏳ ממתין לאישורך';statusBg='#fef3c7';statusColor='#92400e';
-          statusDesc='<div style="font-size:12px;color:#92400e;background:#fef3c7;border-radius:8px;padding:8px 12px;margin-top:.5rem;">'+
-            (other?other.name:'?')+' מבקש להתחלף איתך. האם תאשר?'+
-            '<div style="display:flex;gap:8px;margin-top:8px;">'+
-            '<button onclick="empApproveSwap(\''+w+'\',\''+sid+'\')" style="background:#d1fae5;color:#065f46;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;flex:1;">✔ אשר</button>'+
-            '<button onclick="empRejectSwap(\''+w+'\',\''+sid+'\')" style="background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;flex:1;">✕ דחה</button>'+
-            '</div></div>';}
-        else{statusText='⏳ ממתין לאישור '+( other?other.name:'?');statusBg='#fef3c7';statusColor='#92400e';}
+case 'waiting_employee':
+        statusText=swap.to===CU.id?'⏳ ממתין לאישורך':'⏳ ממתין לאישור '+(other?other.name:'?');
+        statusBg='#fef3c7';statusColor='#92400e';
         break;
       case 'waiting_manager':
         statusText='⏳ ממתין לאישור מנהל';statusBg='#dbeafe';statusColor='#1e40af';
