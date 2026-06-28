@@ -1354,7 +1354,7 @@ window.autoAssign=async function(){
     return emps.filter(e=>{
       if(blocks[e.id]&&blocks[e.id]['d'+di]&&blocks[e.id]['d'+di][shk])return false;
       if(empCnt[e.id]>=maxShifts)return false;
-      if(noConsec&&Math.abs()<=1)return false;
+     if(noConsec&&Math.abs(si(di,shk)-empLast[e.id])<=1)return false;
       if(newS['d'+di][shk].includes(e.id))return false;
       return true;
     }).sort((a,b)=>empCnt[a.id]-empCnt[b.id]);
