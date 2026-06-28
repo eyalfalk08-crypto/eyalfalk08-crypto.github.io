@@ -1917,11 +1917,10 @@ document.getElementById('swap-shk-hidden').value=pick.shk;
   if(confBtn)confBtn.style.display='';
 };
 window.confirmSwapReq=async function(){
-  const w=document.getElementById('swap-w-hidden').value||(_pendSwap&&_pendSwap.w);
-  const diStr=document.getElementById('swap-di-hidden').value;
-const di=diStr!==''?parseInt(diStr):(_pendSwap?_pendSwap.di:NaN);
-  const shk=document.getElementById('swap-shk-hidden').value||(_pendSwap&&_pendSwap.shk);
-  if(!w||isNaN(di)||!shk){alert('שגיאה — נסה שוב');return;}
+  if(!_pendSwap){alert('שגיאה — נסה שוב');return;}
+  const w=_pendSwap.w;
+  const di=_pendSwap.di;
+  const shk=_pendSwap.shk;
   const targetId=document.getElementById('swap-emp-sel').value;
   const note=document.getElementById('swap-note').value.trim();
   if(!targetId)return;
@@ -1929,7 +1928,7 @@ const di=diStr!==''?parseInt(diStr):(_pendSwap?_pendSwap.di:NaN);
   const sh=SHF.find(s=>s.k===shk);
   sl(true);
   await fs('sched/weeks/'+w+'/swaps/s'+ts,{
-    from:CU.id,to:targetId,di,shk,note,ts,
+    from:CU.id,to:targetId,di:di,shk:shk,note:note,ts:ts,
     status:'waiting_employee',week:w
   });
   await sendNotifTo(targetId,'swap','↔ בקשת החלפה חדשה',
