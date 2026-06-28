@@ -1377,7 +1377,7 @@ window.autoAssign=async function(){
         const {max}=mm(shk);
         if(newS['d'+di][shk].length>=max)return;
         if(blocks[emp.id]&&blocks[emp.id]['d'+di]&&blocks[emp.id]['d'+di][shk])return;
-        if(noConsec&&Math.abs(si(di,shk)-empLast[emp.id])<=1)return;
+        if(noConsec&&Math.abs(di-empLast[emp.id])<=1)return;
         if(newS['d'+di][shk].includes(emp.id))return;
         newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empLast[emp.id]=di;changed=true;
       });
