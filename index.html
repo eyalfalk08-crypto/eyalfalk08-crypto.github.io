@@ -1354,7 +1354,7 @@ window.autoAssign=async function(){
     return emps.filter(e=>{
       if(blocks[e.id]&&blocks[e.id]['d'+di]&&blocks[e.id]['d'+di][shk])return false;
       if(empCnt[e.id]>=maxShifts)return false;
-      if(noConsec&&Math.abs(si(di,shk)-empLast[e.id])<=1)return false;
+      if(noConsec&&Math.abs(di-empLast[e.id])<=1)return false;
       if(newS['d'+di][shk].includes(e.id))return false;
       return true;
     }).sort((a,b)=>empCnt[a.id]-empCnt[b.id]);
@@ -1365,7 +1365,7 @@ window.autoAssign=async function(){
   allSlots.forEach(({di,shk})=>{
     const {min,max}=mm(shk);
     avail(di,shk).slice(0,min).forEach(emp=>{
-      newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empLast[emp.id]=si(di,shk);
+      newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empLast[emp.id]=di;
     });
   });
   // Reach min shifts per emp
@@ -1379,7 +1379,7 @@ window.autoAssign=async function(){
         if(blocks[emp.id]&&blocks[emp.id]['d'+di]&&blocks[emp.id]['d'+di][shk])return;
         if(noConsec&&Math.abs(si(di,shk)-empLast[emp.id])<=1)return;
         if(newS['d'+di][shk].includes(emp.id))return;
-        newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empLast[emp.id]=si(di,shk);changed=true;
+        newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empLast[emp.id]=di;changed=true;
       });
     });
   }
