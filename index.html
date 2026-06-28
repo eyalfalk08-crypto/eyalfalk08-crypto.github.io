@@ -443,10 +443,104 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
         <td style="padding:6px;text-align:center;"><input type="number" id="sc-min-night" min="0" max="20" value="1" style="width:55px;padding:5px;border:1.5px solid #e5e7eb;border-radius:7px;text-align:center;font-size:13px;outline:none;"></td>
         <td style="padding:6px;text-align:center;"><input type="number" id="sc-max-night" min="0" max="20" value="3" style="width:55px;padding:5px;border:1.5px solid #e5e7eb;border-radius:7px;text-align:center;font-size:13px;outline:none;"></td>
       </tr>
-    </tbody>
-  </table>
-  <div style="margin-top:.8rem;background:var(--prll);border-radius:9px;padding:.7rem;">
-    <div style="font-size:11px;font-weight:700;color:var(--prd);margin-bottom:.4rem;">⚙️ תנאים נוספים</div>
+   window.saveShiftConstraints=async function(){
+  const sc={
+    minMorning:parseInt(document.getElementById('sc-min-morning').value)||0,
+    maxMorning:parseInt(document.getElementById('sc-max-morning').value)||99,
+    minEvening:parseInt(document.getElementById('sc-min-evening').value)||0,
+    maxEvening:parseInt(document.getElementById('sc-max-evening').value)||99,
+    minNight:parseInt(document.getElementById('sc-min-night').value)||0,
+    maxNight:parseInt(document.getElementById('sc-max-night').value)||99,
+    weMinMorning:parseInt(document.getElementById('sc-we-min-morning').value)||0,
+    weMaxMorning:parseInt(document.getElementById('sc-we-max-morning').value)||99,
+    weMinEvening:parseInt(document.getElementById('sc-we-min-evening').value)||0,
+    weMaxEvening:parseInt(document.getElementById('sc-we-max-evening').value)||99,
+    weMinNight:parseInt(document.getElementById('sc-we-min-night').value)||0,
+    weMaxNight:parseInt(document.getElementById('sc-we-max-night').value)||99,
+    minShiftsPerEmp:parseInt(document.getElementById('sc-min-shifts').value)||0,
+    maxShiftsPerEmp:parseInt(document.getElementById('sc-max-shifts').value)||99,
+    noConsecutive:document.getElementById('sc-no-consec').checked,
+  };
+  sl(true);await fs('sched/config/shiftConstraints',sc);sl(false);ssm('sm-sc');
+};
+async function loadShiftConstraints(){
+  const sc=await fg('sched/config/shiftConstraints')||{};
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  const setc=(id,v)=>{const el=document.getElementById(id);if(el)el.checked=v;};
+  set('sc-min-morning',sc.minMorning??2);set('sc-max-morning',sc.maxMorning??5);
+  set('sc-min-evening',sc.minEvening??2);set('sc-max-evening',sc.maxEvening??5);
+  set('sc-min-night',sc.minNight??1);set('sc-max-night',sc.maxNight??3);
+  set('sc-we-min-morning',sc.weMinMorning??1);set('sc-we-max-morning',sc.weMaxMorning??4);
+  set('sc-we-min-evening',sc.weMinEvening??1);set('sc-we-max-evening',sc.weMaxEvening??4);
+  set('sc-we-min-night',sc.weMinNight??1);set('sc-we-max-night',sc.weMaxNight??3);
+  set('sc-min-shifts',sc.minShiftsPerEmp??5);set('sc-max-shifts',sc.maxShiftsPerEmp??7);
+  setc('sc-no-consec',sc.noConsecutive!==false);
+  return sc;
+}
+window.autoAssign=async function(){
+  if(!confirm('שיבוץ אוטומטי ייצור סידור חדש לפי חסימות ואילוצים. להמשיך?'))return;
+  const w=wk(CW);sl(true);
+  const emps=await fg('sched/config/employees')||DEF_EMPS;
+  const blocks=await fg('sched/weeks/'+w+'/blocks')||{};
+  const sc=await fg('sched/config/shiftConstraints')||{};
+  const minShifts=sc.minShiftsPerEmp??5,maxShifts=sc.maxShiftsPerEmp??7;
+  const noConsec=sc.noConsecutive!==false;
+  // Get min/max per shift, separate weekday vs weekend
+  function mm(shk,isWE){
+    if(isWE){
+      if(shk==='morning')return{min:sc.weMinMorning??1,max:sc.weMaxMorning??4};
+      if(shk==='evening')return{min:sc.weMinEvening??1,max:sc.weMaxEvening??4};
+      return{min:sc.weMinNight??1,max:sc.weMaxNight??3};
+    }
+    if(shk==='morning')return{min:sc.minMorning??2,max:sc.maxMorning??5};
+    if(shk==='evening')return{min:sc.minEvening??2,max:sc.maxEvening??5};
+    return{min:sc.minNight??1,max:sc.maxNight??3};
+  }
+  const newS={};
+  for(let di=0;di<7;di++){newS['d'+di]={};SHF.forEach(sh=>{newS['d'+di][sh.k]=[];});}
+  const empCnt={};emps.forEach(e=>{empCnt[e.id]=0;});
+  // Track last day worked (not shift index) to prevent same-day consecutive
+  const empLastDay={};emps.forEach(e=>{empLastDay[e.id]=-99;});
+  function avail(di,shk){
+    const isWE=di>=5;
+    return emps.filter(e=>{
+      if(blocks[e.id]&&blocks[e.id]['d'+di]&&blocks[e.id]['d'+di][shk])return false;
+      if(empCnt[e.id]>=maxShifts)return false;
+      // No consecutive: can't work adjacent days
+      if(noConsec&&Math.abs(di-empLastDay[e.id])<=1)return false;
+      if(newS['d'+di][shk].includes(e.id))return false;
+      return true;
+    }).sort((a,b)=>empCnt[a.id]-empCnt[b.id]);
+  }
+  const allSlots=[];
+  for(let di=0;di<7;di++)SHF.forEach(sh=>allSlots.push({di,shk:sh.k,isWE:di>=5}));
+  // Fill minimums first
+  allSlots.forEach(({di,shk,isWE})=>{
+    const {min}=mm(shk,isWE);
+    avail(di,shk).slice(0,min).forEach(emp=>{
+      newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empLastDay[emp.id]=di;
+    });
+  });
+  // Reach min shifts per emp (respecting max per slot)
+  let changed=true,iter=0;
+  while(changed&&iter<20){changed=false;iter++;
+    emps.filter(e=>empCnt[e.id]<minShifts).forEach(emp=>{
+      allSlots.forEach(({di,shk,isWE})=>{
+        if(empCnt[emp.id]>=minShifts)return;
+        const {max}=mm(shk,isWE);
+        if(newS['d'+di][shk].length>=max)return;
+        if(blocks[emp.id]&&blocks[emp.id]['d'+di]&&blocks[emp.id]['d'+di][shk])return;
+        if(noConsec&&Math.abs(di-empLastDay[emp.id])<=1)return;
+        if(newS['d'+di][shk].includes(emp.id))return;
+        newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empLastDay[emp.id]=di;changed=true;
+      });
+    });
+  }
+  await fs('sched/weeks/'+w+'/schedule',newS);sl(false);
+  const under=emps.filter(e=>empCnt[e.id]<minShifts).map(e=>e.name);
+  if(under.length)alert('⚠️ הסידור הושלם, אך '+under.join(', ')+' קיבלו פחות מ-'+minShifts+' משמרות (חסימות)');
+  rMgrSched();
+};
     <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:.3rem;">
       <input type="number" id="sc-min-shifts" min="0" max="21" value="5" style="width:55px;padding:5px;border:1.5px solid #e5e7eb;border-radius:7px;text-align:center;font-size:13px;outline:none;">
       מינ׳ משמרות לעובד בשבוע
@@ -1100,6 +1194,7 @@ async function rEmpSched(){
 
 async function rMgrSched(){
   const w=wk(CW);
+  window._lastSC=await fg('sched/config/shiftConstraints')||{};
   document.getElementById('wt-ms').textContent=fw(CW);
   const pub=await fg('sched/weeks/'+w+'/published');
   const volOpen=await fg('sched/weeks/'+w+'/volunteerOpen');
@@ -1165,7 +1260,10 @@ async function rMgrSched(){
       if(pendingVols.length){
         inner+='<div onclick="openVolModal(\''+w+'\','+di+',\''+sh.k+'\')" style="cursor:pointer;margin-top:2px;background:#dcfce7;border-radius:4px;padding:2px 5px;font-size:9px;color:#166534;font-weight:600;">✋ '+pendingVols.length+' מתנדבים</div>';
       }
-      inner+='<button class="ab" onclick="openAddEmpModal(\''+w+'\','+di+',\''+sh.k+'\')">+ הוסף עובד</button>';
+     const {min:scMin,max:scMax}=(()=>{const isWE=di>=5;const _sc=window._lastSC||{};if(isWE){if(sh.k==='morning')return{min:_sc.weMinMorning??1,max:_sc.weMaxMorning??4};if(sh.k==='evening')return{min:_sc.weMinEvening??1,max:_sc.weMaxEvening??4};return{min:_sc.weMinNight??1,max:_sc.weMaxNight??3};}if(sh.k==='morning')return{min:_sc.minMorning??2,max:_sc.maxMorning??5};if(sh.k==='evening')return{min:_sc.minEvening??2,max:_sc.maxEvening??5};return{min:_sc.minNight??1,max:_sc.maxNight??3};})();
+const cntColor=assigned.length<scMin?'#dc2626':assigned.length>scMax?'#d97706':'#059669';
+inner+='<div style="font-size:9px;font-weight:700;color:'+cntColor+';text-align:center;margin:2px 0;">'+assigned.length+'/'+scMin+'–'+scMax+'</div>';
+inner+='<button class="ab" onclick="openAddEmpModal(\''+w+'\','+di+',\''+sh.k+'\')">+ הוסף עובד</button>';
       sb.innerHTML=inner;col.appendChild(sb);
     });
     // Show tasks for this day in mgr schedule
