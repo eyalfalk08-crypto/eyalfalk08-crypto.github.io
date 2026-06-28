@@ -1348,7 +1348,7 @@ window.autoAssign=async function(){
   for(let di=0;di<7;di++){newS['d'+di]={};SHF.forEach(sh=>{newS['d'+di][sh.k]=[];});}
   const empCnt={};emps.forEach(e=>{empCnt[e.id]=0;});
   const empLast={};emps.forEach(e=>{empLast[e.id]=-99;});
-  function si(di,shk){return di*3+SHF.findIndex(s=>s.k===shk);}
+  function si(di,shk){return di;}
   function mm(shk){if(shk==='morning')return{min:minM,max:maxM};if(shk==='evening')return{min:minE,max:maxE};return{min:minN,max:maxN};}
   function avail(di,shk){
     return emps.filter(e=>{
