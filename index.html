@@ -2059,11 +2059,11 @@ case 'waiting_employee':
         const apprBtn=document.createElement('button');
         apprBtn.style.cssText='background:#d1fae5;color:#065f46;border:none;border-radius:8px;padding:9px 0;font-size:13px;font-weight:700;cursor:pointer;flex:1;';
         apprBtn.textContent='✔ אשר';
-        apprBtn.onclick=(function(ww,ss){return function(){empApproveSwap(ww,ss);};})(w,sid);
+        apprBtn.addEventListener('click',function(){empApproveSwap(w,sid);});
         const rejBtn=document.createElement('button');
         rejBtn.style.cssText='background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:9px 0;font-size:13px;font-weight:700;cursor:pointer;flex:1;';
         rejBtn.textContent='✕ דחה';
-        rejBtn.onclick=(function(ww,ss){return function(){empRejectSwap(ww,ss);};})(w,sid);
+       rejBtn.addEventListener('click',function(){empRejectSwap(w,sid);});
         btnRow.appendChild(apprBtn);btnRow.appendChild(rejBtn);
         aBox.appendChild(btnRow);card.appendChild(aBox);
       }
