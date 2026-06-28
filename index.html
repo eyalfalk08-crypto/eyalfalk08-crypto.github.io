@@ -1347,14 +1347,14 @@ window.autoAssign=async function(){
   const newS={};
   for(let di=0;di<7;di++){newS['d'+di]={};SHF.forEach(sh=>{newS['d'+di][sh.k]=[];});}
   const empCnt={};emps.forEach(e=>{empCnt[e.id]=0;});
-  const empLast={};emps.forEach(e=>{empLast[e.id]=-99;});
+  const empShifts={};emps.forEach(e=>{empShifts[e.id]=[];});
   function si(di,shk){return di*3+SHF.findIndex(s=>s.k===shk);}
   function mm(shk){if(shk==='morning')return{min:minM,max:maxM};if(shk==='evening')return{min:minE,max:maxE};return{min:minN,max:maxN};}
   function avail(di,shk){
     return emps.filter(e=>{
       if(blocks[e.id]&&blocks[e.id]['d'+di]&&blocks[e.id]['d'+di][shk])return false;
       if(empCnt[e.id]>=maxShifts)return false;
-     if(noConsec&&Math.abs(si(di,shk)-empLast[e.id])<=1)return false;
+     if(noConsec&&empShifts[e.id].some(s=>Math.abs(si(di,shk)-s)===1))return false;
       if(newS['d'+di][shk].includes(e.id))return false;
       return true;
     }).sort((a,b)=>empCnt[a.id]-empCnt[b.id]);
@@ -1365,7 +1365,7 @@ window.autoAssign=async function(){
   allSlots.forEach(({di,shk})=>{
     const {min,max}=mm(shk);
     avail(di,shk).slice(0,min).forEach(emp=>{
-      newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empLast[emp.id]=si(di,shk);
+      newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empShifts[emp.id].push(si(di,shk));
     });
   });
   // Reach min shifts per emp
@@ -1377,9 +1377,9 @@ window.autoAssign=async function(){
         const {max}=mm(shk);
         if(newS['d'+di][shk].length>=max)return;
         if(blocks[emp.id]&&blocks[emp.id]['d'+di]&&blocks[emp.id]['d'+di][shk])return;
-        if(noConsec&&Math.abs(si(di,shk)-empLast[emp.id])<=1)return;
+        if(noConsec&&empShifts[emp.id].some(s=>Math.abs(si(di,shk)-s)===1))return;
         if(newS['d'+di][shk].includes(emp.id))return;
-        newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empLast[emp.id]=si(di,shk);changed=true;
+        newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empShifts[emp.id].push(si(di,shk));changed=true;
       });
     });
   }
