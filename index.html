@@ -2075,9 +2075,9 @@ window.confirmSwapReq=async function(){
   await sendNotifTo(targetId,'swap','↔ בקשת החלפה חדשה',
     CU.name+' מבקש להתחלף איתך — '+sh.l+' '+DAYS[di]+'. לחץ על לשונית ״החלפות״ לאישור/דחייה',w);
   sl(false);
-  cm('mo-swap-req');
-  alert('הבקשה נשלחה!');
+ cm('mo-swap-req');
   rEmpSwaps();
+  alert('הבקשה נשלחה!');
 };
 window.openSwapMgr=async function(w){
   const swaps=await fg('sched/weeks/'+w+'/swaps')||{};
