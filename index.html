@@ -1717,7 +1717,7 @@ window.saveDL=async function(){
   sl(true);await fs('sched/weeks/'+w+'/deadline/time',time);
   const dd=new Date(time);
   const dtStr=dd.toLocaleDateString('he-IL')+' '+dd.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
-  await sendNotifToAll(w,'deadline','⏰ דד-ליין לחסימות','יש להגיש חסימות עד '+dtStr+' לשבוע '+fw(CW));
+  await sendNotifToAll(w,'deadline','⏰ דד-ליין לחסימות','יש להגיש חסימות עד '+dtStr
   sl(false);ssm('sm-dl');rMgrBlocks();
 };
 window.clearDL=async function(){
