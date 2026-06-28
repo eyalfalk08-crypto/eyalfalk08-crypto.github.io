@@ -1183,7 +1183,7 @@ async function rMgrSched(){
       if(pendingVols.length){
         inner+='<div onclick="openVolModal(\''+w+'\','+di+',\''+sh.k+'\')" style="cursor:pointer;margin-top:2px;background:#dcfce7;border-radius:4px;padding:2px 5px;font-size:9px;color:#166534;font-weight:600;">✋ '+pendingVols.length+' מתנדבים</div>';
       }
-     const {min:scMin,max:scMax}=(()=>{const isWE=di>=5;const _sc=window._lastSC||{};if(isWE){if(sh.k==='morning')return{min:_sc.weMinMorning??1,max:_sc.weMaxMorning??4};if(sh.k==='evening')return{min:_sc.weMinEvening??1,max:_sc.weMaxEvening??4};return{min:_sc.weMinNight??1,max:_sc.weMaxNight??3};}if(sh.k==='morning')return{min:_sc.minMorning??2,max:_sc.maxMorning??5};if(sh.k==='evening')return{min:_sc.minEvening??2,max:_sc.maxEvening??5};return{min:_sc.minNight??1,max:_sc.maxNight??3};})();
+     const {min:scMin,max:scMax}=(()=>{const isWE=di>=5;const _sc=window._lastSC||sc||{};if(isWE){if(sh.k==='morning')return{min:_sc.weMinMorning??1,max:_sc.weMaxMorning??4};if(sh.k==='evening')return{min:_sc.weMinEvening??1,max:_sc.weMaxEvening??4};return{min:_sc.weMinNight??1,max:_sc.weMaxNight??3};}if(sh.k==='morning')return{min:_sc.minMorning??2,max:_sc.maxMorning??5};if(sh.k==='evening')return{min:_sc.minEvening??2,max:_sc.maxEvening??5};return{min:_sc.minNight??1,max:_sc.maxNight??3};})();
 const cntColor=assigned.length<scMin?'#dc2626':assigned.length>scMax?'#d97706':'#059669';
 inner+='<div style="font-size:9px;font-weight:700;color:'+cntColor+';text-align:center;margin:2px 0;">'+assigned.length+'/'+scMin+'–'+scMax+'</div>';
 inner+='<button class="ab" onclick="openAddEmpModal(\''+w+'\','+di+',\''+sh.k+'\')">+ הוסף עובד</button>';
