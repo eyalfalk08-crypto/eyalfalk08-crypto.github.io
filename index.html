@@ -752,9 +752,16 @@ async function enterMgr(){
   ['v-eblocks','v-evol','v-esched','v-eswaps'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.classList.remove('active');
   });
-  mTab('sched');
+ mTab('sched');
   startNotifListener();
   checkAutoDeadline();
+  // Realtime swap badge for manager
+  db.ref('sched/weeks/'+wk(CW)+'/swaps').on('value',snap=>{
+    const swaps=snap.val()||{};
+    const pending=Object.values(swaps).filter(s=>s.status==='waiting_manager').length;
+    const badge=document.getElementById('mgr-swap-badge');
+    if(badge){badge.style.display=pending?'inline':'none';if(pending)badge.textContent=pending;}
+  });
 }
 
 function cw(d){const dt=new Date(CW);dt.setDate(dt.getDate()+d*7);CW=dt;
