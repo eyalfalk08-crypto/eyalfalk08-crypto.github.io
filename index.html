@@ -1918,7 +1918,8 @@ document.getElementById('swap-shk-hidden').value=pick.shk;
 };
 window.confirmSwapReq=async function(){
   const w=document.getElementById('swap-w-hidden').value||(_pendSwap&&_pendSwap.w);
-  const di=parseInt(document.getElementById('swap-di-hidden').value||(_pendSwap&&_pendSwap.di));
+  const diStr=document.getElementById('swap-di-hidden').value;
+const di=diStr!==''?parseInt(diStr):(_pendSwap?_pendSwap.di:NaN);
   const shk=document.getElementById('swap-shk-hidden').value||(_pendSwap&&_pendSwap.shk);
   if(!w||isNaN(di)||!shk){alert('שגיאה — נסה שוב');return;}
   const targetId=document.getElementById('swap-emp-sel').value;
