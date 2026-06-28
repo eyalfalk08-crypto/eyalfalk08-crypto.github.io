@@ -1934,24 +1934,6 @@ window.confirmSwapReq=async function(){
   cm('mo-swap-req');
   alert('הבקשה נשלחה!');
 };
-  const {w,di,shk}=_pendSwap;
-  const targetId=document.getElementById('swap-emp-sel').value;
-  const note=document.getElementById('swap-note').value.trim();
-  if(!targetId)return;
-  const ts=Date.now();
-  const sh=SHF.find(s=>s.k===shk);
-  sl(true);
-  await fs('sched/weeks/'+w+'/swaps/s'+ts,{
-    from:CU.id,to:targetId,di,shk,note,ts,
-    status:'waiting_employee',week:w
-  });
-  // Notify the TARGET employee
-  await sendNotifTo(targetId,'swap','↔ בקשת החלפה חדשה',
-    CU.name+' מבקש להתחלף איתך — '+sh.l+' '+DAYS[di]+'. לחץ על לשונית ״החלפות״ לאישור/דחייה',w);
-  sl(false);
-  cm('mo-swap-req');
-  alert('הבקשה נשלחה ל'+targetId+'! הם יצטרכו לאשר תחילה.');
-};
 window.openSwapMgr=async function(w){
   const swaps=await fg('sched/weeks/'+w+'/swaps')||{};
   const emps=await fg('sched/config/employees')||DEF_EMPS;
