@@ -461,8 +461,16 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
         <td style="padding:6px;text-align:center;"><input type="number" id="sc-we-min-night" min="0" max="20" value="1" style="width:55px;padding:5px;border:1.5px solid #e5e7eb;border-radius:7px;text-align:center;font-size:13px;outline:none;"></td>
         <td style="padding:6px;text-align:center;"><input type="number" id="sc-we-max-night" min="0" max="20" value="3" style="width:55px;padding:5px;border:1.5px solid #e5e7eb;border-radius:7px;text-align:center;font-size:13px;outline:none;"></td>
       </tr>
-    </tbody>
-</table>
+    </tbody></table>
+  <div style="margin-top:.8rem;background:var(--prll);border-radius:9px;padding:.7rem;">
+    <div style="font-size:11px;font-weight:700;color:var(--prd);margin-bottom:.4rem;">🕐 שעות משמרת</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem;font-size:12px;">
+      <div style="font-weight:600;">משמרת</div><div style="font-weight:600;text-align:center;">התחלה</div><div style="font-weight:600;text-align:center;">סיום</div>
+      <div>🌅 בוקר</div><input type="time" id="sh-morning-start" value="07:00" style="padding:4px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:12px;outline:none;"><input type="time" id="sh-morning-end" value="15:00" style="padding:4px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:12px;outline:none;">
+      <div>🌆 ערב</div><input type="time" id="sh-evening-start" value="15:00" style="padding:4px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:12px;outline:none;"><input type="time" id="sh-evening-end" value="23:00" style="padding:4px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:12px;outline:none;">
+      <div>🌙 לילה</div><input type="time" id="sh-night-start" value="23:00" style="padding:4px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:12px;outline:none;"><input type="time" id="sh-night-end" value="07:00" style="padding:4px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:12px;outline:none;">
+    </div>
+  </div>
   <div style="margin-top:.8rem;background:var(--prll);border-radius:9px;padding:.7rem;">
     <div style="font-size:11px;font-weight:700;color:var(--prd);margin-bottom:.4rem;">⚙️ תנאים נוספים</div>
     <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:.3rem;">
