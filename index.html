@@ -1756,6 +1756,9 @@ async function rMgrTasks(){
   document.getElementById('wt-mt').textContent=fw(CW);
   const tasks=await fg('sched/weeks/'+w+'/tasks')||{};
   const emps=await fg('sched/config/employees')||DEF_EMPS;
+  const blocks=await fg('sched/weeks/'+w+'/blocks')||{};
+  const scData=await fg('sched/config/shiftConstraints')||{};
+  window._lastSC=scData;
   const list=document.getElementById('tasks-list');list.innerHTML='';
   if(!Object.keys(tasks).length){
     list.innerHTML='<div class="card" style="text-align:center;color:#888;padding:1.5rem;">אין משמרות/משימות לשבוע זה</div>';return;
