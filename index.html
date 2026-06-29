@@ -1805,7 +1805,7 @@ window.confirmAddTask=async function(){
   if(_editTid){
     // Edit existing task - preserve emps and volOpen
     const existing=await fg('sched/weeks/'+w+'/tasks/'+_editTid)||{};
-    await fs('sched/weeks/'+w+'/tasks/'+_editTid,{...existing,name,date,hours,note,maxVol});
+    await fs('sched/weeks/'+w+'/tasks/'+_editTid,{...existing,name,date,hours,note,maxVol,minEmp,maxEmp});
     _editTid=null;_editW=null;
   }else{
     await fs('sched/weeks/'+wk(CW)+'/tasks/t'+Date.now(),{name,date,hours,note,maxVol,minEmp,maxEmp,emps:[],pendingVols:[]});
