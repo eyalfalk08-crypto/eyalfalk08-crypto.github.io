@@ -1384,7 +1384,6 @@ window.saveShiftConstraints=async function(){
     weMinNight:parseInt(document.getElementById('sc-we-min-night').value)||0,
     weMaxNight:parseInt(document.getElementById('sc-we-max-night').value)||99,
   };
-  };
   sl(true);await fs('sched/config/shiftConstraints',sc);sl(false);ssm('sm-sc');
 };
 async function loadShiftConstraints(){
