@@ -1195,7 +1195,8 @@ async function rMgrSched(){
   }
   const sched=await fg('sched/weeks/'+w+'/schedule')||{};
   const emps=await fg('sched/config/employees')||DEF_EMPS;
-  const blocks=await fg('sched/weeks/'+w+'/blocks')||{};   
+ const blocks=await fg('sched/weeks/'+w+'/blocks')||{};
+  const taskData2=await fg('sched/weeks/'+w+'/tasks')||{};   
   const vols=await fg('sched/weeks/'+w+'/volunteers')||{};
   const notes=await fg('sched/weeks/'+w+'/shiftNotes')||{};
   const tasks=await fg('sched/weeks/'+w+'/tasks')||{};
@@ -1425,8 +1426,8 @@ window.autoAssign=async function(){
       newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empShifts[emp.id].push(si(di,shk));
     });
   });
-  // Reach min shifts per emp
-  let changed=true,iter=0;
+   // Reach min shifts per emp
+ let changed=true,iter=0;
   while(changed&&iter<15){changed=false;iter++;
     emps.filter(e=>empCnt[e.id]<minShifts).forEach(emp=>{
       allSlots.forEach(({di,shk})=>{
@@ -1440,7 +1441,7 @@ window.autoAssign=async function(){
       });
     });
   }
-  // Assign tasks automatically   const taskData2=await fg('sched/weeks/'+w+'/tasks')||{};   const dates2=wds(CW);   const newTasks={};   Object.entries(taskData2).forEach(([tid,task])=>{     if(!task.minEmp&&!task.maxEmp)return;     const minE=task.minEmp||1;     const maxE=task.maxEmp||3;     // Find date index for this task     let taskDi=-1;     dates2.forEach((date,di)=>{       const ddStr=date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');       if(task.date===ddStr)taskDi=di;     });     if(taskDi<0)return;     // Find available employees (not blocked, not over max shifts, not already in task)     const existingEmps=task.emps||[];     const needed=Math.max(0,minE-existingEmps.length);     const available=emps.filter(e=>{       if(existingEmps.includes(e.id))return false;       if(empCnt[e.id]>=maxShifts)return false;       // Check not already assigned to a regular shift on this day       const alreadyInDay=SHF.some(sh=>(newS['d'+taskDi]&&newS['d'+taskDi][sh.k]||[]).includes(e.id));       if(alreadyInDay)return false;       return true;     }).sort((a,b)=>empCnt[a.id]-empCnt[b.id]);     const toAssign=[...existingEmps,...available.slice(0,needed).map(e=>e.id)];     // Remove from regular shifts on same day     toAssign.forEach(empId=>{       SHF.forEach(sh=>{         if(newS['d'+taskDi][sh.k])newS['d'+taskDi][sh.k]=newS['d'+taskDi][sh.k].filter(id=>id!==empId);       });       if(!existingEmps.includes(empId)){empCnt[empId]=(empCnt[empId]||0)+1;}     });     newTasks[tid]={...task,emps:toAssign};   });   // Save tasks   await Promise.all(Object.entries(newTasks).map(([tid,task])=>fs('sched/weeks/'+w+'/tasks/'+tid+'/emps',task.emps)));   await fs('sched/weeks/'+w+'/schedule',newS);sl(false);
+  // Assign tasks automatically   const dates2=wds(CW);   const newTasks={};   Object.entries(taskData2).forEach(([tid,task])=>{     if(!task.minEmp&&!task.maxEmp)return;     const minE=task.minEmp||1;     const maxE=task.maxEmp||3;     // Find date index for this task     let taskDi=-1;     dates2.forEach((date,di)=>{       const ddStr=date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');       if(task.date===ddStr)taskDi=di;     });     if(taskDi<0)return;     // Find available employees (not blocked, not over max shifts, not already in task)     const existingEmps=task.emps||[];     const needed=Math.max(0,minE-existingEmps.length);     const available=emps.filter(e=>{       if(existingEmps.includes(e.id))return false;       if(empCnt[e.id]>=maxShifts)return false;       // Check not already assigned to a regular shift on this day       const alreadyInDay=SHF.some(sh=>(newS['d'+taskDi]&&newS['d'+taskDi][sh.k]||[]).includes(e.id));       if(alreadyInDay)return false;       return true;     }).sort((a,b)=>empCnt[a.id]-empCnt[b.id]);     const toAssign=[...existingEmps,...available.slice(0,needed).map(e=>e.id)];     // Remove from regular shifts on same day     toAssign.forEach(empId=>{       SHF.forEach(sh=>{         if(newS['d'+taskDi][sh.k])newS['d'+taskDi][sh.k]=newS['d'+taskDi][sh.k].filter(id=>id!==empId);       });       if(!existingEmps.includes(empId)){empCnt[empId]=(empCnt[empId]||0)+1;}     });     newTasks[tid]={...task,emps:toAssign};   });   // Save tasks   await Promise.all(Object.entries(newTasks).map(([tid,task])=>fs('sched/weeks/'+w+'/tasks/'+tid+'/emps',task.emps)));   await fs('sched/weeks/'+w+'/schedule',newS);sl(false);
   const under=emps.filter(e=>empCnt[e.id]<minShifts).map(e=>e.name);
   if(under.length)alert('⚠️ הסידור הושלם, אך '+under.join(', ')+' קיבלו פחות מ-'+minShifts+' משמרות (חסימות)');
   rMgrSched();
@@ -1576,7 +1577,7 @@ async function rMgrBlocks(){
   const w=wk(CW);
   document.getElementById('wt-mb').textContent=fw(CW);
   const emps=await fg('sched/config/employees')||DEF_EMPS;
-  const blocks=await fg('sched/weeks/'+w+'/blocks')||{};
+  const blocks=await fg('sched/weeks/'+w+'/blocks')||{};   const taskData2=await fg('sched/weeks/'+w+'/tasks')||{};
   const notes=await fg('sched/weeks/'+w+'/notes')||{};
   const dlData=await fg('sched/weeks/'+w+'/deadline')||{};
   _bs=await fg('sched/config/blockSettings')||DEF_BS;
