@@ -1577,7 +1577,7 @@ async function rMgrBlocks(){
   const w=wk(CW);
   document.getElementById('wt-mb').textContent=fw(CW);
   const emps=await fg('sched/config/employees')||DEF_EMPS;
-  const blocks=await fg('sched/weeks/'+w+'/blocks')||{};   const taskData2=await fg('sched/weeks/'+w+'/tasks')||{};
+  const blocks=await fg('sched/weeks/'+w+'/blocks')||{};
   const notes=await fg('sched/weeks/'+w+'/notes')||{};
   const dlData=await fg('sched/weeks/'+w+'/deadline')||{};
   _bs=await fg('sched/config/blockSettings')||DEF_BS;
