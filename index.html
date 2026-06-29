@@ -1257,7 +1257,7 @@ inner+='<button class="ab" onclick="openAddEmpModal(\''+w+'\','+di+',\''+sh.k+'\
     });
     // Show tasks for this day in mgr schedule
     const dayStr3=date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
-    Object.entries(tasks||{}).filter(([,t])=>t.date===dayStr3||t.day==di).forEach(([tid,t])=>{
+    Object.entries(tasks||{}).filter(([,t])=>t.date===dayStr3||t.day==di).sort(([,a],[,b])=>{       const aS=a.hours?a.hours.split('-')[0].trim():'00:00';       const bS=b.hours?b.hours.split('-')[0].trim():'00:00';       return aS.localeCompare(bS);     }).forEach(([tid,t])=>{
       const tb=document.createElement('div');
       tb.style.cssText='background:#fef9c3;border-right:3px solid #d97706;border-radius:6px;padding:.5rem .7rem;margin-bottom:.4rem;font-size:11px;';
       const pendCount=(t.pendingVols||[]).length;
