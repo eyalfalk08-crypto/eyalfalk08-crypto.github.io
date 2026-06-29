@@ -1808,7 +1808,7 @@ window.confirmAddTask=async function(){
     await fs('sched/weeks/'+w+'/tasks/'+_editTid,{...existing,name,date,hours,note,maxVol});
     _editTid=null;_editW=null;
   }else{
-    await fs('sched/weeks/'+wk(CW)+'/tasks/t'+Date.now(),{name,date,hours,note,maxVol,emps:[],pendingVols:[]});
+    await fs('sched/weeks/'+wk(CW)+'/tasks/t'+Date.now(),{name,date,hours,note,maxVol,minEmp,maxEmp,emps:[],pendingVols:[]});
   }
   sl(false);
   // Reset modal
