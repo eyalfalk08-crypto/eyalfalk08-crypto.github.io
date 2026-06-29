@@ -1799,7 +1799,7 @@ window.confirmAddTask=async function(){
   const date=document.getElementById('tk-date').value;
   const hours=document.getElementById('tk-hours').value.trim();
   const note=document.getElementById('tk-note').value.trim();
-  const maxVol=parseInt(document.getElementById('tk-maxvol').value)||0;
+  const maxVol=parseInt(document.getElementById('tk-maxvol').value)||0;   const minEmp=parseInt(document.getElementById('tk-minemp').value)||1;   const maxEmp=parseInt(document.getElementById('tk-maxemp').value)||3;
   const w=_editTid?_editW:wk(CW);
   sl(true);
   if(_editTid){
