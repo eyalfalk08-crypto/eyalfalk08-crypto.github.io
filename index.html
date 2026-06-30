@@ -1454,9 +1454,10 @@ const allSlots=[];
   function sortByRotation(list,di,shk){return list;}
   allSlots.forEach(({di,shk})=>{
     const {min,max}=mm(shk,di);
-    sortByRotation(avail(di,shk),di,shk).slice(0,min).forEach(emp=>{
+   sortByRotation(avail(di,shk),di,shk).slice(0,min).forEach(emp=>{
       newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empShifts[emp.id].push(si(di,shk));
-      
+      if(di===5&&shk==='morning')updateRotation('fridayMorning',emp.id);
+      if(di===5&&shk==='evening')updateRotation('fridayEvening',emp.id);
     });
   });
    // Reach min shifts per emp
