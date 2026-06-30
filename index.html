@@ -1517,7 +1517,7 @@ const allSlots=[];
   }
  const fridaySlots=allSlots.filter(s=>s.di===5&&(s.shk==='morning'||s.shk==='evening'));
   const otherSlots=allSlots.filter(s=>!(s.di===5&&(s.shk==='morning'||s.shk==='evening')));
-  [...fridaySlots,...otherSlots].forEach(({di,shk})=>{
+ for(const {di,shk} of [...fridaySlots,...otherSlots]){
     const {min,max}=mm(shk,di);
     const isFriShift=di===5&&(shk==='morning'||shk==='evening');
     let pool=avail(di,shk);
@@ -1528,11 +1528,11 @@ const allSlots=[];
     }
    const sortedPool=sortByRotation(pool,di,shk);
     if(isFriShift)console.log('sorted pool:',sortedPool.map(e=>e.id+':'+ (di===5&&shk==='morning'?(rotFM2.counts[e.id]||0):(rotFE2.counts[e.id]||0))));
-    sortedPool.slice(0,min).forEach(emp=>{
+   for(const emp of sortedPool.slice(0,min)){
       newS['d'+di][shk].push(emp.id);empCnt[emp.id]++;empShifts[emp.id].push(si(di,shk));
-      if(di===5&&shk==='morning')updateRotation('fridayMorning',emp.id);
-      if(di===5&&shk==='evening')updateRotation('fridayEvening',emp.id);
-    });
+      if(di===5&&shk==='morning'){await updateRotation('fridayMorning',emp.id);rotFM2.counts[emp.id]=(rotFM2.counts[emp.id]||0)+1;}
+      if(di===5&&shk==='evening'){await updateRotation('fridayEvening',emp.id);rotFE2.counts[emp.id]=(rotFE2.counts[emp.id]||0)+1;}
+    }
   });
    // Reach min shifts per emp
  let changed=true,iter=0;
