@@ -536,6 +536,33 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
       </div>
     </div>
     <div class="card" style="max-width:300px;">
+      <h3>חסימה גורפת לכל העובדים</h3>
+      <p style="font-size:12px;color:#888;margin-bottom:.8rem;">חסום משמרת מסוימת לכל העובדים בשבוע הנוכחי</p>
+      <div class="fg">
+        <label>יום</label>
+        <select id="bulk-block-day" style="width:100%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none;">
+          <option value="0">ראשון</option>
+          <option value="1">שני</option>
+          <option value="2">שלישי</option>
+          <option value="3">רביעי</option>
+          <option value="4">חמישי</option>
+          <option value="5">שישי</option>
+          <option value="6">שבת</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>משמרת</label>
+        <select id="bulk-block-shift" style="width:100%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none;">
+          <option value="morning">בוקר</option>
+          <option value="evening">ערב</option>
+          <option value="night">לילה</option>
+        </select>
+      </div>
+      <button class="bp" onclick="bulkBlockShift()" style="margin-top:0;">חסום לכולם</button>
+      <button onclick="bulkUnblockShift()" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:9px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;margin-top:.5rem;width:100%;">בטל חסימה לכולם</button>
+      <div class="sm" id="sm-bulk">בוצע!</div>
+    </div>
+    <div class="card" style="max-width:300px;">
       <h3>ניקוי נתונים</h3>
       <p style="font-size:12px;color:#888;margin-bottom:.8rem;">מחיקת כל הנתונים שנצברו (חסימות, סידורים, התנדבויות, התראות)</p>
       <button onclick="resetAllData()" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:9px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;">🗑 מחק הכל</button>
