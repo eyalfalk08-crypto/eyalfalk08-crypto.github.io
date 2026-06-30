@@ -1515,7 +1515,9 @@ const allSlots=[];
       return (aIdx<0?999:aIdx)-(bIdx<0?999:bIdx);
     });
   }
-  allSlots.forEach(({di,shk})=>{
+ const fridaySlots=allSlots.filter(s=>s.di===5&&(s.shk==='morning'||s.shk==='evening'));
+  const otherSlots=allSlots.filter(s=>!(s.di===5&&(s.shk==='morning'||s.shk==='evening')));
+  [...fridaySlots,...otherSlots].forEach(({di,shk})=>{
     const {min,max}=mm(shk,di);
     const isFriShift=di===5&&(shk==='morning'||shk==='evening');
     let pool=avail(di,shk);
