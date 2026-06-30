@@ -1847,7 +1847,7 @@ window.removeRotEmp=async function(rotKey,empId){
   sl(true);await fs('sched/config/rotations/'+rotKey,rot);sl(false);
   rMgrRotations();
 };
-window.moveRotEmp=async function(rotKey,empId,dir){
+window.resetRotation=async function(rotKey){   if(!confirm('לאפס את כל הספירות בסבב? (העובדים יישארו ברשימה)'))return;   const rot=await fg('sched/config/rotations/'+rotKey)||{order:[],counts:{}};   rot.order.forEach(id=>{rot.counts[id]=0;});   sl(true);await fs('sched/config/rotations/'+rotKey,rot);sl(false);   rMgrRotations(); }; window.moveRotEmp=async function(rotKey,empId,dir){
   const rot=await fg('sched/config/rotations/'+rotKey)||{order:[],counts:{}};
   const idx=rot.order.indexOf(empId);
   const newIdx=idx+dir;
