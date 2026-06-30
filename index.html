@@ -1804,7 +1804,7 @@ async function rMgrRotations(){ const emps=await fg('sched/config/employees')||D
         (isBlocked?' <span style="color:#dc2626;font-size:10px;font-weight:700;">חסום</span>':'')+
         '</span>'+
         '<span style="display:flex;align-items:center;gap:6px;">'+
-        '<span style="background:'+(count<=1?'#dcfce7':count===2?'#fef9c3':'#fee2e2')+';color:'+(count<=1?'#166534':count===2?'#92400e':'#991b1b')+';border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">'+count+'</span>'+
+        '<span style="background:'+(count===0?'#dbeafe':count===1?'#dcfce7':count===2?'#fef9c3':'#fee2e2')+';color:'+(count===0?'#1e40af':count===1?'#166534':count===2?'#92400e':'#991b1b')+';border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">'+count+'</span>'+
         '<button onclick="moveRotEmp(\''+rotKey+'\',\''+empId+'\',-1)" style="background:none;border:none;cursor:pointer;font-size:13px;">↑</button>'+
         '<button onclick="moveRotEmp(\''+rotKey+'\',\''+empId+'\',1)" style="background:none;border:none;cursor:pointer;font-size:13px;">↓</button>'+
         '<button onclick="removeRotEmp(\''+rotKey+'\',\''+empId+'\')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;">×</button>'+
