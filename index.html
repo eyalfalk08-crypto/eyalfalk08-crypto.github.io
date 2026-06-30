@@ -1699,7 +1699,14 @@ window.publishToggle=async function(){
         for(const empId of (task.emps||[])){await updateRotation('dira',empId);}
       }
     }
-    await fs('sched/weeks/'+w+'/published',true);
+   await fs('sched/weeks/'+w+'/published',true);
+    // Unpublish all previous weeks
+    const allWeeks=await fg('sched/weeks')||{};
+    for(const weekKey of Object.keys(allWeeks)){
+      if(weekKey!==w&&allWeeks[weekKey].published){
+        await fs('sched/weeks/'+weekKey+'/published',false);
+      }
+    }
     sl(false);
     await sendNotifToAll(w,'publish','📋 סידור שבועי פורסם','הסידור ל'+fw(CW)+' זמין כעת לצפייה');
   }
