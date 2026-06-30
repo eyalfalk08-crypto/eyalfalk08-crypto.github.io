@@ -823,7 +823,18 @@ window.eTab=function(tab){
   if(tab==='blocks')rEmpBlocks();
   else if(tab==='vol')rEmpVol();
   else if(tab==='sched')rEmpSched();
-  else if(tab==='swaps')rEmpSwaps();
+ else if(tab==='swaps'){rEmpSwaps();markSwapsSeen();}
+};
+window.markSwapsSeen=async function(){
+  const w=wk(CW);
+  const swaps=await fg('sched/weeks/'+w+'/swaps')||{};
+  const seenKey='seenBy_'+CU.id;
+  const updates={};
+  Object.entries(swaps).forEach(([sid,s])=>{
+    const isMine=s.from===CU.id||s.to===CU.id;
+    if(isMine&&!s[seenKey])updates['sched/weeks/'+w+'/swaps/'+sid+'/'+seenKey]=true;
+  });
+  if(Object.keys(updates).length)await db.ref().update(updates);
 };
 window.mTab=function(tab){
   document.querySelectorAll('#mtabs .tab').forEach(t=>{
