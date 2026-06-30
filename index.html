@@ -821,7 +821,7 @@ window.mTab=function(tab){
   document.querySelectorAll('#mtabs .tab').forEach(t=>{
     const m=t.getAttribute('onclick').match(/'(\w+)'/);if(m)t.classList.toggle('active',m[1]===tab);
   });
-  ['msched','mblocks','mtasks','mswaps','msettings'].forEach(v=>{
+  ['msched','mblocks','mtasks','mswaps','mrotations','msettings'].forEach(v=>{
     const el=document.getElementById('v-'+v);if(el)el.classList.toggle('active','m'+tab===v);
   });
   if(tab==='sched')rMgrSched();
