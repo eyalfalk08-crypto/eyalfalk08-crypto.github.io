@@ -388,7 +388,8 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
     </div>
   </div>
 
-  <!-- MGR ROTATIONS -->   <div id="v-mrotations" class="view">     <div class="card">       <h3>🔄 סבב שישי בוקר</h3>       <div id="rot-fridayMorning-list"></div>       <button class="badd" onclick="addRotEmp('fridayMorning')">+ הוסף עובד לסבב</button>     </div>     <div class="card">       <h3>🔄 סבב שישי ערב</h3>       <div id="rot-fridayEvening-list"></div>       <button class="badd" onclick="addRotEmp('fridayEvening')">+ הוסף עובד לסבב</button>     </div>     <div class="card">       <h3>🔄 סבב דירה</h3>       <div id="rot-dira-list"></div>       <button class="badd" onclick="addRotEmp('dira')">+ הוסף עובד לסבב</button>     </div>   </div>    <!-- MGR SETTINGS -->
+  <!-- MGR ROTATIONS -->   <div id="v-mrotations" class="view">     <div class="card">       <h3>🔄 סבב שישי בוקר</h3>       <div id="rot-fridayMorning-list"></div>       <button class="badd" onclick="addRotEmp('fridayMorning')">+ הוסף עובד לסבב</button>       <button onclick="resetRotation('fridayMorning')" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;margin-top:.4rem;width:100%;">🔄 אפס סבב</button>     </div>     <div class="card">       <h3>🔄 סבב שישי ערב</h3>       <div id="rot-fridayEvening-list"></div>      <button class="badd" onclick="addRotEmp('fridayEvening')">+ הוסף עובד לסבב</button>
+      <button onclick="resetRotation('fridayEvening')" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;margin-top:.4rem;width:100%;">🔄 אפס סבב</button>       <button onclick="resetRotation('fridayEvening')" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;margin-top:.4rem;width:100%;">🔄 אפס סבב</button>     </div>     <div class="card">       <h3>🔄 סבב דירה</h3>       <div id="rot-dira-list"></div>       <button class="badd" onclick="addRotEmp('dira')">+ הוסף עובד לסבב</button>     </div>   </div>    <!-- MGR SETTINGS -->
   <div id="v-msettings" class="view">
     <div class="card">
       <h3>הגדרות חסימות כלליות</h3>
@@ -1803,7 +1804,7 @@ async function rMgrRotations(){ const emps=await fg('sched/config/employees')||D
         (isBlocked?' <span style="color:#dc2626;font-size:10px;font-weight:700;">חסום</span>':'')+
         '</span>'+
         '<span style="display:flex;align-items:center;gap:6px;">'+
-        '<span style="background:var(--prll);color:var(--prd);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">'+count+'</span>'+
+        '<span style="background:'+(count<=1?'#dcfce7':count===2?'#fef9c3':'#fee2e2')+';color:'+(count<=1?'#166534':count===2?'#92400e':'#991b1b')+';border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">'+count+'</span>'+
         '<button onclick="moveRotEmp(\''+rotKey+'\',\''+empId+'\',-1)" style="background:none;border:none;cursor:pointer;font-size:13px;">↑</button>'+
         '<button onclick="moveRotEmp(\''+rotKey+'\',\''+empId+'\',1)" style="background:none;border:none;cursor:pointer;font-size:13px;">↓</button>'+
         '<button onclick="removeRotEmp(\''+rotKey+'\',\''+empId+'\')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;">×</button>'+
