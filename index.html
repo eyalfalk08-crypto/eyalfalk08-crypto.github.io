@@ -769,7 +769,14 @@ async function enterEmp(){
   // Update swap badge - realtime
 db.ref('sched/weeks/'+wk(CW)+'/swaps').on('value',snap=>{
     const swaps=snap.val()||{};
-    const pending=Object.values(swaps).filter(s=>(s.from===CU.id||s.to===CU.id)&&s.status==='waiting_employee').length;
+    let pending=0;
+    Object.values(swaps).forEach(s=>{
+      const isMine=s.from===CU.id||s.to===CU.id;
+      if(!isMine)return;
+      if(s.to===CU.id&&s.status==='waiting_employee'){pending++;return;}
+      const seenKey='seenBy_'+CU.id;
+      if((s.status==='approved'||s.status==='rejected_by_employee'||s.status==='rejected_by_manager'||s.status==='waiting_manager')&&!s[seenKey]){pending++;}
+    });
     const badge=document.getElementById('emp-swap-badge');
     if(badge){badge.style.display=pending?'inline':'none';if(pending)badge.textContent=pending;}
   });
