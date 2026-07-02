@@ -894,51 +894,49 @@ async function rEmpBlocks(){
   const _CW=new Date(CW);
   const w=wk(_CW),dates=wds(_CW);
   document.getElementById('wt-eb').textContent=fw(_CW);
- const [bsData,pubData,sched0Data,dlData0,myBData,myNData]= await Promise.all([
+  const container=document.getElementById('v-eblocks');
+  
+  const [bsData,pubData,dlData0,myBData,myNData]=await Promise.all([
     fg('sched/config/blockSettings'),
     fg('sched/weeks/'+w+'/published'),
-    fg('sched/weeks/'+w+'/schedule'),
     fg('sched/weeks/'+w+'/deadline'),
     fg('sched/weeks/'+w+'/blocks/'+CU.id),
     fg('sched/weeks/'+w+'/notes/'+CU.id),
   ]);
   if(!_bs)_bs=bsData||DEF_BS;
   const pub=pubData;
-  const sched0=sched0Data;
-  const hasSchedule=sched0&&Object.keys(sched0).length>0;
-  if(!pub&&hasSchedule){
-    // Past published week - show read-only schedule instead of blocks
-    showPastScheduleReadonly(w,dates);
-    return;
-  }
-  document.getElementById('eb-grid').style.display='';
-  document.querySelector('#v-eblocks .fg').style.display='';
-  document.querySelector('#v-eblocks .bp').style.display='';
-const dlData=dlData0||{};   const now=new Date(),past=pub||(dlData.time&&new Date(dlData.time)<now);
-  const badge=document.getElementById('dl-badge'),warn=document.getElementById('dl-warn');
-  if(pub){
-    badge.style.display='';
-    badge.textContent='🔒 הסידור פורסם — חסימות נעולות';
-    badge.className='dlb cl';
-    warn.innerHTML='🔒 הסידור לשבוע זה פורסם על ידי המנהל — לא ניתן לשנות חסימות';
-    warn.style.display='block';
-  } else if(dlData.time){
-    const dd=new Date(dlData.time);badge.style.display='';
-    badge.textContent=(past?'⛔ ':'✔ ')+'דד-ליין: '+dd.toLocaleDateString('he-IL')+' '+dd.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
-    badge.className='dlb '+(past?'cl':'ok');warn.style.display=past?'block':'none';
-    warn.innerHTML=warn.innerHTML||'⛔ הדד-ליין עבר — לא ניתן לשנות חסימות';
-  }else{badge.style.display='none';warn.style.display='none';}
+  const dlData=dlData0||{};
+  const now=new Date();
+  const dlPast=dlData.time&&new Date(dlData.time)<now;
+  const locked=pub||dlPast;
   const myB=myBData||{};
   const myN=myNData||'';
-  document.getElementById('enote').value=myN;
+
+  // Show/hide elements
+  const grid=document.getElementById('eb-grid');
+  const noteEl=document.getElementById('enote');
+  const saveBtn=container.querySelector('.bp');
+  const badge=document.getElementById('dl-badge');
+  const warn=document.getElementById('dl-warn');
+  if(grid)grid.style.display='';
+  if(noteEl){noteEl.value=myN;noteEl.disabled=locked;}
+  if(saveBtn)saveBtn.style.display=locked?'none':'';
+
+  // Badge/warn
+  if(pub){
+    badge.style.display='';badge.textContent='🔒 הסידור פורסם';badge.className='dlb cl';
+    warn.innerHTML='🔒 הסידור לשבוע זה פורסם — לא ניתן לשנות חסימות';warn.style.display='block';
+  }else if(dlData.time){
+    const dd=new Date(dlData.time);
+    badge.style.display='';
+    badge.textContent=(dlPast?'⛔ ':'✔ ')+'דד-ליין: '+dd.toLocaleDateString('he-IL')+' '+dd.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+    badge.className='dlb '+(dlPast?'cl':'ok');
+    warn.style.display=dlPast?'block':'none';
+    warn.innerHTML='⛔ הדד-ליין עבר — לא ניתן לשנות חסימות';
+  }else{badge.style.display='none';warn.style.display='none';}
+
+  // Count blocks
   const mb=CU.maxBlocks&&typeof CU.maxBlocks==='object'?CU.maxBlocks:{};
-  // Helper to get max for a shift+day
-  function getMax(shk,di){
-    const isWE=di>=5;
-    if(isWE){return mb['weekendMorning']!==undefined?(shk==='morning'?mb.weekendMorning:shk==='evening'?mb.weekendEvening:mb.weekendNight):(mb.morning||3);}
-    return mb['wdMorning']!==undefined?(shk==='morning'?mb.wdMorning:shk==='evening'?mb.wdEvening:mb.wdNight):(mb.morning||3);
-  }
-  // count per shift, split weekday/weekend
   const wdCnt={morning:0,evening:0,night:0},weCnt={morning:0,evening:0,night:0};
   for(let di=0;di<7;di++){const db2=myB['d'+di]||{};SHF.forEach(sh=>{if(db2[sh.k]){if(di>=5)weCnt[sh.k]++;else wdCnt[sh.k]++;}});}
   const wdMax={morning:mb.wdMorning||3,evening:mb.wdEvening||3,night:mb.wdNight||3};
@@ -946,38 +944,43 @@ const dlData=dlData0||{};   const now=new Date(),past=pub||(dlData.time&&new Dat
   document.getElementById('bc').innerHTML=
     '<span style="font-size:10px;">📅 ב:'+wdCnt.morning+'/'+wdMax.morning+' ע:'+wdCnt.evening+'/'+wdMax.evening+' ל:'+wdCnt.night+'/'+wdMax.night+'</span>'+
     '&nbsp;|&nbsp;<span style="font-size:10px;">🗓 ב:'+weCnt.morning+'/'+weMax.morning+' ע:'+weCnt.evening+'/'+weMax.evening+' ל:'+weCnt.night+'/'+weMax.night+'</span>';
-  const grid=document.getElementById('eb-grid');grid.innerHTML='';
+
+  // Build grid
+  grid.innerHTML='';
   dates.forEach((date,di)=>{
-    const isWE=di>=5,col=document.createElement('div');col.className='dc';
+    const isWE=di>=5;
+    const col=document.createElement('div');col.className='dc';
     const hdr=document.createElement('div');hdr.className='dh'+(isWE?' we':'');
-    hdr.innerHTML='<div>'+DAYS[di]+'</div><div style="font-size:10px;font-weight:400;">'+fd(date)+'</div>';col.appendChild(hdr);
+    hdr.innerHTML='<div>'+DAYS[di]+'</div><div style="font-size:10px;font-weight:400;">'+fd(date)+'</div>';
+    col.appendChild(hdr);
     SHF.forEach(sh=>{
-      const isWknd=di>=5;
-      let key;
-      if(isWknd){key=sh.k==='morning'?'allowWeekendMorning':sh.k==='evening'?'allowWeekendEvening':'allowWeekendNight';}
-      else{key=sh.k==='morning'?'allowMorning':sh.k==='evening'?'allowEvening':'allowNight';}
-      const allowed=_bs[key]!==false;
+      const allowKey=isWE?(sh.k==='morning'?'allowWeekendMorning':sh.k==='evening'?'allowWeekendEvening':'allowWeekendNight'):(sh.k==='morning'?'allowMorning':sh.k==='evening'?'allowEvening':'allowNight');
+      const allowed=_bs[allowKey]!==false;
       const blocked=myB['d'+di]&&myB['d'+di][sh.k];
       const cell=document.createElement('div');
-      if(!allowed||past){
-       const isBlockedCell=myB['d'+di]&&myB['d'+di][sh.k];
-        cell.className='sc '+(isBlockedCell?'sc-bl':'sc-lk');
-        cell.style.opacity=isBlockedCell?'1':'0.5';
+      if(!allowed){
+        cell.className='sc sc-lk';cell.textContent='—';
+      }else if(locked){
+        cell.className='sc '+(blocked?'sc-bl':'sc-lk');
         cell.style.cursor='not-allowed';
-        cell.style.filter=isBlockedCell?'brightness(0.7)':'none';
-        cell.textContent=isBlockedCell?'✕':allowed?'🔒':'—';
-        cell.title=pub?'הסידור פורסם — לא ניתן לשנות':'עבר הדד-ליין — לא ניתן לשנות';
-      }
-      else{
-        cell.className='sc '+(blocked?'sc-bl':sh.cls);cell.textContent=blocked?'✕':sh.l;
+        cell.style.opacity=blocked?'1':'0.5';
+        cell.style.filter=blocked?'brightness(0.75)':'none';
+        cell.textContent=blocked?'✕':'🔒';
+        cell.title=pub?'הסידור פורסם':'הדד-ליין עבר';
+      }else{
+        cell.className='sc '+(blocked?'sc-bl':sh.cls);
+        cell.textContent=blocked?'✕':sh.l;
         cell.onclick=async()=>{
-          if(past){alert(pub?'הסידור פורסם — לא ניתן לשנות חסימות':'עבר הדד-ליין לחסימות');return;}
-          if(blocked){await db.ref('sched/weeks/'+w+'/blocks/'+CU.id+'/d'+di+'/'+sh.k).set(false);await rEmpBlocks();return;}
+          if(blocked){
+            await db.ref('sched/weeks/'+w+'/blocks/'+CU.id+'/d'+di+'/'+sh.k).set(false);
+            await rEmpBlocks();return;
+          }
           const isWE2=di>=5;
           const curCnt=isWE2?weCnt[sh.k]:wdCnt[sh.k];
           const curMax=isWE2?weMax[sh.k]:wdMax[sh.k];
           if(curCnt>=curMax){alert('הגעת למקסימום '+curMax+' חסימות למשמרת '+sh.l+(isWE2?' בסופ"ש':' בימים רגילים'));return;}
-          sl(true);await db.ref('sched/weeks/'+w+'/blocks/'+CU.id+'/d'+di+'/'+sh.k).set(true);sl(false);await rEmpBlocks();
+          sl(true);await db.ref('sched/weeks/'+w+'/blocks/'+CU.id+'/d'+di+'/'+sh.k).set(true);sl(false);
+          await rEmpBlocks();
         };
       }
       col.appendChild(cell);
