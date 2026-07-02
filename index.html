@@ -817,7 +817,9 @@ async function enterMgr(){
   ['v-eblocks','v-evol','v-esched','v-eswaps'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.classList.remove('active');
   });
- await loadShiftConstraints();
+ const scLoaded=await loadShiftConstraints();
+  console.log('loaded sc:',JSON.stringify(scLoaded));
+  console.log('sc-min-morning val:',document.getElementById('sc-min-morning')?.value);
   mTab('sched');
   startNotifListener();
   checkAutoDeadline();
