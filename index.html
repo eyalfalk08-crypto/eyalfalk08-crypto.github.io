@@ -1777,7 +1777,7 @@ async function rMgrBlocks(){
       dd.toLocaleDateString('he-IL')+' '+dd.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})+'</div>';
   }else statusEl.innerHTML='';
   document.getElementById('st-e').textContent=emps.length;
-  const sub=emps.filter(e=>{     if(!blocks[e.id])return false;     // Check if any actual block exists (not just empty object)     for(let di=0;di<7;di++){       const dayB=blocks[e.id]['d'+di];       if(dayB&&Object.values(dayB).some(v=>v===true))return true;     }     return false;   });
+  const sub=emps.filter(e=>{if(!blocks[e.id])return false;for(let di=0;di<7;di++){const dayB=blocks[e.id]['d'+di];if(dayB&&Object.values(dayB).some(v=>v===true))return true;}return false;});
   document.getElementById('st-s').textContent=sub.length;
   document.getElementById('st-p').textContent=emps.length-sub.length;
 
