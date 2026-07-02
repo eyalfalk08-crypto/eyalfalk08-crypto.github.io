@@ -1175,7 +1175,6 @@ async function rEmpSched(){
       '<div style="font-size:14px;color:#9ca3af;">המנהל טרם פרסם את הסידור לשבוע זה</div></div>';
     return;
   }
-}   const showPastBanner=(!pub&&wasPub&&hasSched)||(isPast&&hasSched&&pub); 
   const pastBanner=showPastBanner?'<div style="background:#f3f4f6;border:2px dashed #d1d5db;border-radius:12px;padding:.7rem 1rem;margin-bottom:.8rem;display:flex;align-items:center;gap:.7rem;"><span style="font-size:20px;">📅</span><div><div style="font-size:13px;font-weight:700;color:#6b7280;">סידור שבוע שעבר</div><div style="font-size:11px;color:#9ca3af;">זהו סידור היסטורי — לצפייה בלבד</div></div></div>':'';
   if(showPastBanner&&!pub&&!hasSched){container.innerHTML=pastBanner;return;}
   const sched=await fg('sched/weeks/'+w+'/schedule')||{};
