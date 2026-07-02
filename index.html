@@ -891,8 +891,9 @@ window.mTab=function(tab){
 
 // ===== EMP BLOCKS =====
 async function rEmpBlocks(){
-  const w=wk(CW),dates=wds(CW);
-  document.getElementById('wt-eb').textContent=fw(CW);
+  const _CW=new Date(CW);
+  const w=wk(_CW),dates=wds(_CW);
+  document.getElementById('wt-eb').textContent=fw(_CW);
  const [bsData,pubData,sched0Data,dlData0,myBData,myNData]= await Promise.all([
     fg('sched/config/blockSettings'),
     fg('sched/weeks/'+w+'/published'),
