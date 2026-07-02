@@ -1187,7 +1187,6 @@ async function rEmpSched(){
       '<div><div style="font-size:13px;font-weight:700;color:#6b7280;">סידור שבוע שעבר</div>'+
       '<div style="font-size:11px;color:#9ca3af;">זהו סידור היסטורי — לצפייה בלבד</div></div>';
   }
-  }
   const sched=await fg('sched/weeks/'+w+'/schedule')||{};
   const tasks=await fg('sched/weeks/'+w+'/tasks')||{};
   const notes=await fg('sched/weeks/'+w+'/shiftNotes')||{};
