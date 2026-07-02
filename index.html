@@ -885,10 +885,17 @@ window.mTab=function(tab){
 async function rEmpBlocks(){
   const w=wk(CW),dates=wds(CW);
   document.getElementById('wt-eb').textContent=fw(CW);
-  if(!_bs)_bs=await fg('sched/config/blockSettings')||DEF_BS;
-  // Check if schedule is published - if so, lock blocks
-  const pub=await fg('sched/weeks/'+w+'/published');
-  const sched0=await fg('sched/weeks/'+w+'/schedule');
+ const [bsData,pubData,sched0Data,dlData0,myBData,myNData]= await Promise.all([
+    fg('sched/config/blockSettings'),
+    fg('sched/weeks/'+w+'/published'),
+    fg('sched/weeks/'+w+'/schedule'),
+    fg('sched/weeks/'+w+'/deadline'),
+    fg('sched/weeks/'+w+'/blocks/'+CU.id),
+    fg('sched/weeks/'+w+'/notes/'+CU.id),
+  ]);
+  if(!_bs)_bs=bsData||DEF_BS;
+  const pub=pubData;
+  const sched0=sched0Data;
   const hasSchedule=sched0&&Object.keys(sched0).length>0;
   if(!pub&&hasSchedule){
     // Past published week - show read-only schedule instead of blocks
@@ -898,8 +905,7 @@ async function rEmpBlocks(){
   document.getElementById('eb-grid').style.display='';
   document.querySelector('#v-eblocks .fg').style.display='';
   document.querySelector('#v-eblocks .bp').style.display='';
-  const dlData=await fg('sched/weeks/'+w+'/deadline')||{};
-  const now=new Date(),past=pub||(dlData.time&&new Date(dlData.time)<now);
+const dlData=dlData0||{};   const now=new Date(),past=pub||(dlData.time&&new Date(dlData.time)<now);
   const badge=document.getElementById('dl-badge'),warn=document.getElementById('dl-warn');
   if(pub){
     badge.style.display='';
@@ -913,8 +919,8 @@ async function rEmpBlocks(){
     badge.className='dlb '+(past?'cl':'ok');warn.style.display=past?'block':'none';
     warn.innerHTML=warn.innerHTML||'⛔ הדד-ליין עבר — לא ניתן לשנות חסימות';
   }else{badge.style.display='none';warn.style.display='none';}
-  const myB=await fg('sched/weeks/'+w+'/blocks/'+CU.id)||{};
-  const myN=await fg('sched/weeks/'+w+'/notes/'+CU.id)||'';
+  const myB=myBData||{};
+  const myN=myNData||'';
   document.getElementById('enote').value=myN;
   const mb=CU.maxBlocks&&typeof CU.maxBlocks==='object'?CU.maxBlocks:{};
   // Helper to get max for a shift+day
