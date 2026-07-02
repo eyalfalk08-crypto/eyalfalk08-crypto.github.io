@@ -431,7 +431,7 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
     <tbody>
       <tr style="border-bottom:1px solid var(--prl);">
         <td style="padding:8px;font-weight:600;">🌅 בוקר</td>
-        <td style="padding:6px;text-align:center;"><input type="number" id="sc-min-morning" min="0" max="20" value="2" style="width:55px;padding:5px;border:1.5px solid #e5e7eb;border-radius:7px;text-align:center;font-size:13px;outline:none;"></td>
+        <td style="padding:6px;text-align:center;"><input type="number" id="sc-min-morning" min="0" max="20" value="" style="width:55px;padding:5px;border:1.5px solid #e5e7eb;border-radius:7px;text-align:center;font-size:13px;outline:none;"></td>
         <td style="padding:6px;text-align:center;"><input type="number" id="sc-max-morning" min="0" max="20" value="5" style="width:55px;padding:5px;border:1.5px solid #e5e7eb;border-radius:7px;text-align:center;font-size:13px;outline:none;"></td>
       </tr>
       <tr style="border-bottom:1px solid var(--prl);">
@@ -817,7 +817,8 @@ async function enterMgr(){
   ['v-eblocks','v-evol','v-esched','v-eswaps'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.classList.remove('active');
   });
- mTab('sched');
+ await loadShiftConstraints();
+  mTab('sched');
   startNotifListener();
   checkAutoDeadline();
   checkReminder();
